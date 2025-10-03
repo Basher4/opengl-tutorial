@@ -70,6 +70,32 @@ typedef struct {
     float r, g, b;
 } Vertex;
 
+static void GLAPIENTRY
+GlDebugMessageCb([[maybe_unused]] GLenum _source,
+                 [[maybe_unused]] GLenum type,
+                 GLuint id,
+                 GLenum severity,
+                 [[maybe_unused]] GLsizei length,
+                 const GLchar *message,
+                 [[maybe_unused]] const void *userParam) {
+
+    switch (severity) {
+    case GL_DEBUG_SEVERITY_LOW:
+        std::cout << "[LOW";
+        break;
+    case GL_DEBUG_SEVERITY_MEDIUM:
+        std::cout << "[MED";
+        break;
+    case GL_DEBUG_SEVERITY_HIGH:
+        std::cout << "[HIGH";
+        break;
+    }
+
+    std::cout << "(" << id << ")] " << message << std::endl;
+}
+
+using Callback = GLDEBUGPROC;
+
 int main() {
     if (!glfwInit()) {
         std::cout << "Failed to initialize GLFW3" << std::endl;
@@ -92,6 +118,9 @@ int main() {
         std::cout << "Failed to initialize GLEW: " << err << std::endl;
         return -1;
     }
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(GlDebugMessageCb, nullptr);
 
     auto shader = CompileShader("./shaders/shader.vert", "./shaders/shader.frag");
     if (!shader) {
