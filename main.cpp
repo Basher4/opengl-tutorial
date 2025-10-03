@@ -118,6 +118,7 @@ int main() {
 
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
 
     GLenum err = glewInit();
     if (err != GLEW_OK) {
@@ -168,10 +169,13 @@ int main() {
     glUseProgram(*shader);
 
     /* Loop until the user closes the window */
+    float time = 0.0;
     while (!glfwWindowShouldClose(window))
     {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glUniform1f(0, time);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
@@ -180,6 +184,8 @@ int main() {
 
         /* Poll for and process events */
         glfwPollEvents();
+
+        time += 0.05;
     }
 
     glDeleteProgram(*shader);
