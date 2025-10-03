@@ -16,7 +16,7 @@ static std::string ReadFile(const std::filesystem::path& path) {
 
 static std::expected<uint32_t, std::string> CreateShader(const uint32_t type, const char* source) {
     uint32_t shader = glCreateShader(type);
-    glShaderSource(shader, 1, &source, NULL);
+    glShaderSource(shader, 1, &source, nullptr);
     glCompileShader(shader);
 
     int result = 0;
@@ -25,8 +25,9 @@ static std::expected<uint32_t, std::string> CreateShader(const uint32_t type, co
         int length = 0;
         glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
 
-        char message[length + 1];
-        glGetShaderInfoLog(shader, length, &length, message);
+        std::string message;
+        message.resize(length);
+        glGetShaderInfoLog(shader, length, &length, const_cast<char*>(message.c_str()));
         glDeleteShader(shader);
 
         return std::unexpected(std::string(message));

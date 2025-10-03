@@ -1,6 +1,14 @@
 project('cherno-opengl', 'cpp',
         version : '1.0.0',
-        default_options : ['warning_level=3', 'cpp_std=c++23'])
+        default_options : ['warning_level=3'])
+
+cpp = meson.get_compiler('cpp')
+
+if cpp.get_id() == 'msvc'
+    add_project_arguments('/std:c++latest', language : 'cpp')
+else
+    add_project_arguments('-std=c++23', language : 'cpp')
+endif
 
 glfw_dep = dependency('glfw3', 
                       fallback : ['glfw', 'glfw_dep'],
