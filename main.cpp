@@ -99,22 +99,34 @@ int main() {
         return -1;
     }
 
-    Vertex triangle[] = {
+    Vertex vertices[] = {
         { -0.5f, -0.5f, 1.0f, 0.0f, 0.0f },
         {  0.5f, -0.5f, 0.0f, 1.0f, 0.0f },
-        {  0.0f,  0.5f, 0.0f, 0.0f, 1.0f },
+        {  0.5f,  0.5f, 0.0f, 0.0f, 1.0f },
+        { -0.5f,  0.5f, 1.0f, 1.0f, 1.0f },
     };
 
-    GLuint buffer;
-    glGenBuffers(1, &buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(triangle), triangle, GL_STATIC_DRAW);
+    uint32_t vertex_buffer = 0;
+    glGenBuffers(1, &vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
 
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, r));
+
+
+    uint32_t indices[] = {
+        0, 1, 2,
+        2, 3, 0,
+    };
+
+    uint32_t ibo = 0;
+    glGenBuffers(1, &ibo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
@@ -126,7 +138,7 @@ int main() {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
