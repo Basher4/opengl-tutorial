@@ -77,21 +77,27 @@ GlDebugMessageCb([[maybe_unused]] GLenum _source,
                  GLenum severity,
                  [[maybe_unused]] GLsizei length,
                  const GLchar *message,
-                 [[maybe_unused]] const void *userParam) {
-
+                 const void *userParam) {
     switch (severity) {
-    case GL_DEBUG_SEVERITY_LOW:
-        std::cout << "[LOW";
-        break;
-    case GL_DEBUG_SEVERITY_MEDIUM:
-        std::cout << "[MED";
-        break;
-    case GL_DEBUG_SEVERITY_HIGH:
-        std::cout << "[HIGH";
-        break;
+        case GL_DEBUG_SEVERITY_NOTIFICATION:
+            std::cout << "[INF";
+            break;
+        case GL_DEBUG_SEVERITY_LOW:
+            std::cout << "[LOW";
+            break;
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            std::cout << "[MED";
+            break;
+        case GL_DEBUG_SEVERITY_HIGH:
+            std::cout << "[HIGH";
+            break;
     }
 
     std::cout << "(" << id << ")] " << message << std::endl;
+
+    if (severity == GL_DEBUG_SEVERITY_HIGH) {
+        glfwSetWindowShouldClose((GLFWwindow*)userParam, 1);
+    }
 }
 
 using Callback = GLDEBUGPROC;
@@ -120,7 +126,7 @@ int main() {
     }
 
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(GlDebugMessageCb, nullptr);
+    glDebugMessageCallback(GlDebugMessageCb, window);
 
     auto shader = CompileShader("./shaders/shader.vert", "./shaders/shader.frag");
     if (!shader) {
