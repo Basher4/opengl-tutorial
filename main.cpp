@@ -32,12 +32,8 @@ int main() {
     App app(640, 480);
     app.Init();
 
-    auto vert = EXPECT(ShaderSource::create(ShaderType::Vertex, "./shaders/shader.vert"),
-                       "Failed to create vertex shader");
-    auto frag = EXPECT(ShaderSource::create(ShaderType::Fragment, "./shaders/shader.frag"),
-                       "Failed to create fragment shader");
-    auto shader = EXPECT(Shader::create(std::move(vert), std::move(frag)),
-                         "Failed to create shader");
+    auto shader = EXPECT(Shader::create("./shaders/shader.vert", "./shaders/shader.frag"),
+                         "Failed to create shaders");
 
     constexpr auto vertices = std::to_array<Vertex>({
         { -0.5f, -0.5f, 1.0f, 0.0f, 0.0f },
@@ -61,7 +57,7 @@ int main() {
 
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
-    glUseProgram(shader.id());
+    shader.Bind();
 
     /* Loop until the user closes the window */
     float time = 0.0;
