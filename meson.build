@@ -16,7 +16,7 @@ glfw_dep = dependency('glfw3',
 glew_dep = dependency('glew', default_options: ['default_library=static', 'warning_level=0'])
 opengl_dep = dependency('gl')
 
-srcs = ['main.cpp', 'app.cpp', 'program.cpp']
+srcs = ['main.cpp', 'app.cpp', 'shader.cpp', 'vertex_array.cpp', 'vertex_buffer.cpp', 'index_buffer.cpp']
 cherno_opengl = executable('cherno_opengl', srcs,
                           dependencies : [glfw_dep, opengl_dep, glew_dep],
                           install : true)

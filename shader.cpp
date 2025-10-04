@@ -1,4 +1,4 @@
-#include "program.h"
+#include "shader.h"
 
 #include <fstream>
 
@@ -9,25 +9,25 @@ static std::string ReadFile(const std::filesystem::path& path) {
     return source.str();
 }
 
-Shader & Shader::operator=(Shader &&other) noexcept {
+ShaderSource & ShaderSource::operator=(ShaderSource &&other) noexcept {
     if (this != &other) {
         // Clean up current resource
-        if (m_Id != 0) {
-            glDeleteShader(m_Id);
+        if (m_RendererId != 0) {
+            glDeleteShader(m_RendererId);
         }
         // Transfer ownership
-        m_Id = other.m_Id;
-        other.m_Id = 0;
+        m_RendererId = other.m_RendererId;
+        other.m_RendererId = 0;
     }
     return *this;
 }
 
-Shader::~Shader() {
-    if (m_Id == 0) return;
-    glDeleteShader(m_Id);
+ShaderSource::~ShaderSource() {
+    if (m_RendererId == 0) return;
+    glDeleteShader(m_RendererId);
 }
 
-std::expected<Shader, std::string> Shader::create(ShaderType type, const std::filesystem::path &path) {
+std::expected<ShaderSource, std::string> ShaderSource::create(ShaderType type, const std::filesystem::path &path) {
     uint32_t shader = glCreateShader(static_cast<GLenum>(type));
 
     const std::string source = ReadFile(path);
@@ -51,23 +51,28 @@ std::expected<Shader, std::string> Shader::create(ShaderType type, const std::fi
         return std::unexpected(std::string(message));
     }
 
-    return Shader(shader);
+    return ShaderSource(shader);
 }
 
-Program & Program::operator=(Program &&other) noexcept {
+Shader & Shader::operator=(Shader &&other) noexcept {
     if (this != &other) {
         // Clean up current resource
-        if (m_Id != 0) {
-            glDeleteProgram(m_Id);
+        if (m_RendererId != 0) {
+            glDeleteProgram(m_RendererId);
         }
         // Transfer ownership
-        m_Id = other.m_Id;
-        other.m_Id = 0;
+        m_RendererId = other.m_RendererId;
+        other.m_RendererId = 0;
     }
     return *this;
 }
+void
+Shader::Use() const
+{
+    glUseProgram(m_RendererId);
+}
 
-Program::~Program() {
-    if (m_Id == 0) return;
-    glDeleteProgram(m_Id);
+Shader::~Shader() {
+    if (m_RendererId == 0) return;
+    glDeleteProgram(m_RendererId);
 }

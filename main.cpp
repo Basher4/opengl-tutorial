@@ -1,3 +1,4 @@
+#include <array>
 #include <expected>
 #include <filesystem>
 #include <format>
@@ -7,7 +8,10 @@
 #include <GLFW/glfw3.h>
 
 #include "app.h"
-#include "program.h"
+#include "index_buffer.h"
+#include "shader.h"
+#include "vertex_array.h"
+#include "vertex_buffer.h"
 
 typedef struct {
     float x, y;
@@ -28,45 +32,32 @@ int main() {
     App app(640, 480);
     app.Init();
 
-    auto vert = EXPECT(Shader::create(ShaderType::Vertex, "./shaders/shader.vert"),
+    auto vert = EXPECT(ShaderSource::create(ShaderType::Vertex, "./shaders/shader.vert"),
                        "Failed to create vertex shader");
-    auto frag = EXPECT(Shader::create(ShaderType::Fragment, "./shaders/shader.frag"),
+    auto frag = EXPECT(ShaderSource::create(ShaderType::Fragment, "./shaders/shader.frag"),
                        "Failed to create fragment shader");
-    auto shader = EXPECT(Program::create(std::move(vert), std::move(frag)),
+    auto shader = EXPECT(Shader::create(std::move(vert), std::move(frag)),
                          "Failed to create shader");
 
-    Vertex vertices[] = {
+    constexpr auto vertices = std::to_array<Vertex>({
         { -0.5f, -0.5f, 1.0f, 0.0f, 0.0f },
         {  0.5f, -0.5f, 0.0f, 1.0f, 0.0f },
         {  0.5f,  0.5f, 0.0f, 0.0f, 1.0f },
         { -0.5f,  0.5f, 1.0f, 1.0f, 1.0f },
-    };
+    });
 
-    uint32_t vao = 0;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
+    VertexArray va;
+    VertexBuffer vb(vertices);
+    va.AddBuffer(vb, {
+        VertexBufferElement(2, VertexAttribType::Float, 0),
+        VertexBufferElement(3, VertexAttribType::Float, offsetof(Vertex, r)),
+    });
 
-    uint32_t vertex_buffer = 0;
-    glGenBuffers(1, &vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, r));
-
-
-    uint32_t indices[] = {
+    constexpr auto indices = std::to_array<uint32_t>({
         0, 1, 2,
         2, 3, 0,
-    };
-
-    uint32_t ibo = 0;
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    });
+    IndexBuffer ibo(indices);
 
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
@@ -81,6 +72,8 @@ int main() {
 
         glUniform1f(0, time);
 
+        va.Bind();
+        ibo.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
         /* Swap front and back buffers */
