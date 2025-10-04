@@ -21,7 +21,7 @@ private:
 template<typename Container>
 IndexBuffer::IndexBuffer(const Container& data) {
     std::span<const Container::value_type> span_data(data);
-    m_Count = span_data.size();
+    m_Count = static_cast<uint32_t>(span_data.size());
 
     glGenBuffers(1, &m_RendererId);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererId);

@@ -66,7 +66,7 @@ int main() {
         /* Render here */
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUniform1f(0, time);
+        shader.SetUniform(0, time);
 
         va.Bind();
         ibo.Bind();

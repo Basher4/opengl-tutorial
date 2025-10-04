@@ -17,6 +17,9 @@ public:
 
     void Bind() const;
 
+    template<typename... T>
+    void SetUniform(int slot, T... value);
+
     static std::expected<Shader, std::string> create(
         const std::filesystem::path& vertex_path, const std::filesystem::path& fragment_path);
 
@@ -63,3 +66,13 @@ private:
         uint32_t m_RendererId = 0;
     };
 };
+
+template <> inline void Shader::SetUniform(int slot, float v1) { glUniform1f(slot, v1); }
+template <> inline void Shader::SetUniform(int slot, float v1, float v2) { glUniform2f(slot, v1, v2); }
+template <> inline void Shader::SetUniform(int slot, float v1, float v2, float v3) { glUniform3f(slot, v1, v2, v3); }
+template <> inline void Shader::SetUniform(int slot, int v1) { glUniform1i(slot, v1); }
+template <> inline void Shader::SetUniform(int slot, int v1, int v2) { glUniform2i(slot, v1, v2); }
+template <> inline void Shader::SetUniform(int slot, int v1, int v2, int v3) { glUniform3i(slot, v1, v2, v3); }
+template <> inline void Shader::SetUniform(int slot, uint32_t v1) { glUniform1ui(slot, v1); }
+template <> inline void Shader::SetUniform(int slot, uint32_t v1, uint32_t v2) { glUniform2ui(slot, v1, v2); }
+template <> inline void Shader::SetUniform(int slot, uint32_t v1, uint32_t v2, uint32_t v3) { glUniform3ui(slot, v1, v2, v3); }
