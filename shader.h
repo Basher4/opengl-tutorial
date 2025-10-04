@@ -16,6 +16,7 @@ public:
     ~Shader();
 
     void Bind() const;
+    void Unbind() const;
 
     template<typename... T>
     void SetUniform(int slot, T... value) { static_assert(false, "Not implemented"); }

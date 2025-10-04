@@ -17,6 +17,7 @@ Shader::~Shader()
 }
 
 void Shader::Bind() const { glUseProgram(m_RendererId); }
+void Shader::Unbind() const { glUseProgram(0); }
 
 std::expected<Shader, std::string> Shader::create(
     const std::filesystem::path& vertex_path, const std::filesystem::path& fragment_path)
